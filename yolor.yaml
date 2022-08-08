@@ -1,0 +1,4 @@
+train: ../.././datasets/bosch/train.txt
+val: ../.././datasets/bosch/test.txt
+nc: 8 # number of classes
+names: ['RedLeft', 'Red', 'RedRight', 'GreenLeft', 'Green', 'GreenRight', 'Yellow', 'off']  # class names
