@@ -3,7 +3,7 @@
 import glob
 import math
 import os
-import randomhttps://github.com/cherry17/TRAFFIC_LIGHT_DETECTION_YOLOR/blob/main/utils/datasets.py
+import random
 import shutil
 import time
 from itertools import repeat
