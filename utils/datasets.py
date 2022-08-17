@@ -3,7 +3,7 @@
 import glob
 import math
 import os
-import random
+import randomhttps://github.com/cherry17/TRAFFIC_LIGHT_DETECTION_YOLOR/blob/main/utils/datasets.py
 import shutil
 import time
 from itertools import repeat
@@ -446,46 +446,49 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         for i, file in pbar:
             l = self.labels[i]  # label
             if l is not None and l.shape[0]:
-                assert l.shape[1] == 5, '> 5 label columns: %s' % file
-                assert (l >= 0).all(), 'negative labels: %s' % file
-                assert (l[:, 1:] <= 1).all(), 'non-normalized or out of bounds coordinate labels: %s' % file
-                if np.unique(l, axis=0).shape[0] < l.shape[0]:  # duplicate rows
-                    nd += 1  # print('WARNING: duplicate rows in %s' % self.label_files[i])  # duplicate rows
-                if single_cls:
-                    l[:, 0] = 0  # force dataset into single-class mode
-                self.labels[i] = l
-                nf += 1  # file found
+                try:
+                    assert l.shape[1] == 5, '> 5 label columns: %s' % file
+                    assert (l >= 0).all(), 'negative labels: %s' % file
+                    assert (l[:, 1:] <= 1).all(), 'non-normalized or out of bounds coordinate labels: %s' % file
+                    if np.unique(l, axis=0).shape[0] < l.shape[0]:  # duplicate rows
+                        nd += 1  # print('WARNING: duplicate rows in %s' % self.label_files[i])  # duplicate rows
+                    if single_cls:
+                        l[:, 0] = 0  # force dataset into single-class mode
+                    self.labels[i] = l
+                    nf += 1  # file found
 
-                # Create subdataset (a smaller dataset)
-                if create_datasubset and ns < 1E4:
-                    if ns == 0:
-                        create_folder(path='./datasubset')
-                        os.makedirs('./datasubset/images')
-                    exclude_classes = 43
-                    if exclude_classes not in l[:, 0]:
-                        ns += 1
-                        # shutil.copy(src=self.img_files[i], dst='./datasubset/images/')  # copy image
-                        with open('./datasubset/images.txt', 'a') as f:
-                            f.write(self.img_files[i] + '\n')
+                    # Create subdataset (a smaller dataset)
+                    if create_datasubset and ns < 1E4:
+                        if ns == 0:
+                            create_folder(path='./datasubset')
+                            os.makedirs('./datasubset/images')
+                        exclude_classes = 43
+                        if exclude_classes not in l[:, 0]:
+                            ns += 1
+                            # shutil.copy(src=self.img_files[i], dst='./datasubset/images/')  # copy image
+                            with open('./datasubset/images.txt', 'a') as f:
+                                f.write(self.img_files[i] + '\n')
 
-                # Extract object detection boxes for a second stage classifier
-                if extract_bounding_boxes:
-                    p = Path(self.img_files[i])
-                    img = cv2.imread(str(p))
-                    h, w = img.shape[:2]
-                    for j, x in enumerate(l):
-                        f = '%s%sclassifier%s%g_%g_%s' % (p.parent.parent, os.sep, os.sep, x[0], j, p.name)
-                        if not os.path.exists(Path(f).parent):
-                            os.makedirs(Path(f).parent)  # make new output folder
+                    # Extract object detection boxes for a second stage classifier
+                    if extract_bounding_boxes:
+                        p = Path(self.img_files[i])
+                        img = cv2.imread(str(p))
+                        h, w = img.shape[:2]
+                        for j, x in enumerate(l):
+                            f = '%s%sclassifier%s%g_%g_%s' % (p.parent.parent, os.sep, os.sep, x[0], j, p.name)
+                            if not os.path.exists(Path(f).parent):
+                                os.makedirs(Path(f).parent)  # make new output folder
 
-                        b = x[1:] * [w, h, w, h]  # box
-                        b[2:] = b[2:].max()  # rectangle to square
-                        b[2:] = b[2:] * 1.3 + 30  # pad
-                        b = xywh2xyxy(b.reshape(-1, 4)).ravel().astype(np.int)
+                            b = x[1:] * [w, h, w, h]  # box
+                            b[2:] = b[2:].max()  # rectangle to square
+                            b[2:] = b[2:] * 1.3 + 30  # pad
+                            b = xywh2xyxy(b.reshape(-1, 4)).ravel().astype(np.int)
 
-                        b[[0, 2]] = np.clip(b[[0, 2]], 0, w)  # clip boxes outside of image
-                        b[[1, 3]] = np.clip(b[[1, 3]], 0, h)
-                        assert cv2.imwrite(f, img[b[1]:b[3], b[0]:b[2]]), 'Failure extracting classifier boxes'
+                            b[[0, 2]] = np.clip(b[[0, 2]], 0, w)  # clip boxes outside of image
+                            b[[1, 3]] = np.clip(b[[1, 3]], 0, h)
+                            assert cv2.imwrite(f, img[b[1]:b[3], b[0]:b[2]]), 'Failure extracting classifier boxes'
+                except Exception as e:
+                    print("Ignoring the exception")  
             else:
                 ne += 1  # print('empty labels for image %s' % self.img_files[i])  # file empty
                 # os.system("rm '%s' '%s'" % (self.img_files[i], self.label_files[i]))  # remove
