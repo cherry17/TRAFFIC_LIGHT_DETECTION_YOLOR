@@ -1,4 +1,4 @@
 train: /content/drive/MyDrive/datasets/bosch/train.txt
 val:   /content/drive/MyDrive/datasets/bosch/test.txt
-nc: 8 # number of classes
-names: ['RedLeft', 'Red', 'RedRight', 'GreenLeft', 'Green', 'GreenRight', 'Yellow', 'off']  # class names
+nc: 12 # number of classes
+names: ['RedLeft', 'Red', 'RedRight', 'GreenLeft', 'Green', 'GreenRight', 'Yellow', 'off', "RedStraight", 'RedStraightLeft', 'GreenStraight','GreenStraightRight']  # class names
